@@ -5,6 +5,7 @@ import { Code, Palette, PenTool, Heart, BarChart3, GraduationCap, Camera, Messag
 export default function CategoriesSection() {
   const handleCategoryClick = (categoryName: string) => {
     const slug = categoryName.toLowerCase().replace(/\s+/g, '-')
+    // Use Next.js router for better performance
     window.location.href = `/category/${slug}`
   }
   const categories = [
