@@ -4,29 +4,8 @@ import { Code, Palette, PenTool, Heart, BarChart3, GraduationCap, Camera, Messag
 
 export default function CategoriesSection() {
   const handleCategoryClick = (categoryName: string) => {
-    // Store the selected category in sessionStorage so ToolsSection can pick it up
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('selectedCategory', categoryName)
-    }
-    
-    // Scroll to tools section
-    const toolsSection = document.getElementById('tools-section')
-    if (toolsSection) {
-      toolsSection.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  const handleViewAllCategories = () => {
-    // Clear any selected category
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('selectedCategory')
-    }
-    
-    // Scroll to tools section
-    const toolsSection = document.getElementById('tools-section')
-    if (toolsSection) {
-      toolsSection.scrollIntoView({ behavior: 'smooth' })
-    }
+    const slug = categoryName.toLowerCase().replace(/\s+/g, '-')
+    window.location.href = `/category/${slug}`
   }
   const categories = [
     {
@@ -123,10 +102,7 @@ export default function CategoriesSection() {
         </div>
         
         <div className="text-center mt-12">
-          <button 
-            onClick={handleViewAllCategories}
-            className="btn-secondary text-lg px-8 py-4"
-          >
+          <button className="btn-secondary text-lg px-8 py-4">
             View All Categories
           </button>
         </div>
