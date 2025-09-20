@@ -26,6 +26,20 @@ interface Tool {
 
 // Convert URL slug to category name
 function formatCategoryName(slug: string): string {
+  // Handle special cases for multi-word categories
+  const specialCases: { [key: string]: string } = {
+    'image-generation': 'Image Generation',
+    'meeting-notes': 'Meeting Notes',
+    'workflow-automation': 'Workflow Automation',
+    'knowledge-management': 'Knowledge Management',
+    'video-generation': 'Video Generation',
+    'data-visualization': 'Data Visualization'
+  }
+  
+  if (specialCases[slug]) {
+    return specialCases[slug]
+  }
+  
   return slug
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -54,7 +68,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     setLoading(false)
     
     // Set page title
-    document.title = `${name} AI Tools - AI Toolkit Hub`
+    if (typeof document !== 'undefined') {
+      document.title = `${name} AI Tools - AI Toolkit Hub`
+    }
   }, [params.slug])
   
   if (loading) {

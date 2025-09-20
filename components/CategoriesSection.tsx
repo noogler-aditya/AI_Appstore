@@ -1,6 +1,6 @@
 'use client'
 
-import { Code, Palette, PenTool, Heart, BarChart3, GraduationCap, Camera, MessageSquare } from 'lucide-react'
+import { Code, Palette, PenTool, Heart, BarChart3, GraduationCap, Camera, MessageSquare, Bot, Presentation, Mail, Image, FileSpreadsheet, Calendar, Workflow, Brain, Video, Zap } from 'lucide-react'
 
 export default function CategoriesSection() {
   const handleCategoryClick = (categoryName: string) => {
@@ -10,55 +10,92 @@ export default function CategoriesSection() {
   }
   const categories = [
     {
-      icon: Code,
-      name: "Coding",
-      count: "150+ tools",
+      icon: Bot,
+      name: "Chatbots",
+      count: "8+ tools",
       color: "bg-blue-100 text-blue-600",
       popular: true
     },
     {
-      icon: Palette,
-      name: "Design",
-      count: "120+ tools",
+      icon: Presentation,
+      name: "Presentation",
+      count: "8+ tools",
       color: "bg-purple-100 text-purple-600",
       popular: true
     },
     {
-      icon: PenTool,
-      name: "Writing",
-      count: "80+ tools",
+      icon: Code,
+      name: "Coding",
+      count: "6+ tools",
       color: "bg-green-100 text-green-600",
       popular: true
     },
     {
-      icon: Heart,
-      name: "Healthcare",
-      count: "45+ tools",
+      icon: Mail,
+      name: "Email",
+      count: "5+ tools",
       color: "bg-red-100 text-red-600"
     },
     {
-      icon: BarChart3,
-      name: "Analytics",
-      count: "90+ tools",
+      icon: Image,
+      name: "Image Generation",
+      count: "7+ tools",
+      color: "bg-pink-100 text-pink-600",
+      popular: true
+    },
+    {
+      icon: FileSpreadsheet,
+      name: "Spreadsheet",
+      count: "5+ tools",
       color: "bg-orange-100 text-orange-600"
     },
     {
       icon: GraduationCap,
-      name: "Education",
-      count: "65+ tools",
+      name: "Meeting Notes",
+      count: "7+ tools",
       color: "bg-indigo-100 text-indigo-600"
     },
     {
-      icon: Camera,
-      name: "Media",
-      count: "75+ tools",
-      color: "bg-pink-100 text-pink-600"
+      icon: Zap,
+      name: "Workflow Automation",
+      count: "5+ tools",
+      color: "bg-teal-100 text-teal-600"
     },
     {
-      icon: MessageSquare,
-      name: "Communication",
-      count: "55+ tools",
-      color: "bg-teal-100 text-teal-600"
+      icon: PenTool,
+      name: "Writing",
+      count: "9+ tools",
+      color: "bg-emerald-100 text-emerald-600"
+    },
+    {
+      icon: Calendar,
+      name: "Scheduling",
+      count: "6+ tools",
+      color: "bg-cyan-100 text-cyan-600"
+    },
+    {
+      icon: Brain,
+      name: "Knowledge Management",
+      count: "3+ tools",
+      color: "bg-amber-100 text-amber-600"
+    },
+    {
+      icon: Video,
+      name: "Video Generation",
+      count: "10+ tools",
+      color: "bg-rose-100 text-rose-600"
+    },
+    {
+      icon: Palette,
+      name: "Design",
+      count: "6+ tools",
+      color: "bg-violet-100 text-violet-600"
+    },
+    {
+      icon: BarChart3,
+      name: "Data Visualization",
+      count: "5+ tools",
+      color: "bg-lime-100 text-lime-600"
     }
   ]
 
@@ -74,7 +111,7 @@ export default function CategoriesSection() {
           </p>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {categories.map((category, index) => (
             <div 
               key={index} 
