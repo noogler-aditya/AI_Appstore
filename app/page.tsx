@@ -3,8 +3,6 @@ import TrustSignals from '../components/TrustSignals'
 import HowItWorks from '../components/HowItWorks'
 import CategoriesSection from '../components/CategoriesSection'
 import ChatbotTeaser from '../components/ChatbotTeaser'
-import TrendingSection from '../components/TrendingSection'
-import ToolsSection from '../components/ToolsSection'
 import StickyCTA from '../components/StickyCTA'
 
 export default function LandingPage() {
@@ -15,8 +13,6 @@ export default function LandingPage() {
       <HowItWorks />
       <CategoriesSection />
       <ChatbotTeaser />
-      <TrendingSection />
-      <ToolsSection />
       <StickyCTA />
     </main>
   )
