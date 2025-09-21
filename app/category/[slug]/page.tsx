@@ -35,11 +35,11 @@ function formatCategoryName(slug: string): string {
     'video-generation': 'Video Generation',
     'data-visualization': 'Data Visualization'
   }
-  
+
   if (specialCases[slug]) {
     return specialCases[slug]
   }
-  
+
   return slug
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -48,7 +48,7 @@ function formatCategoryName(slug: string): string {
 
 // Get tools by category
 function getToolsByCategory(category: string): Tool[] {
-  return toolsData.filter(tool => 
+  return toolsData.filter(tool =>
     tool.category.toLowerCase() === category.toLowerCase()
   )
 }
@@ -58,21 +58,21 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const [tools, setTools] = useState<Tool[]>([])
   const [categoryName, setCategoryName] = useState('')
   const [loading, setLoading] = useState(true)
-  
+
   useEffect(() => {
     const name = formatCategoryName(params.slug)
     const categoryTools = getToolsByCategory(name)
-    
+
     setCategoryName(name)
     setTools(categoryTools)
     setLoading(false)
-    
+
     // Set page title
     if (typeof document !== 'undefined') {
       document.title = `${name} AI Tools - AI Toolkit Hub`
     }
   }, [params.slug])
-  
+
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -83,7 +83,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       </main>
     )
   }
-  
+
   // If no tools found for this category, show 404
   if (tools.length === 0) {
     return (
@@ -91,7 +91,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         <div className="max-w-md mx-auto text-center px-4">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Category Not Found</h1>
           <p className="text-gray-600 mb-8">The category you're looking for doesn't exist.</p>
-          <button 
+          <button
             onClick={() => router.push('/')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -101,7 +101,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       </main>
     )
   }
-  
+
   const handleToolClick = (website: string, toolName: string) => {
     // Analytics tracking could be added here
     window.open(website, '_blank', 'noopener,noreferrer')
@@ -118,7 +118,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb Navigation */}
           <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-            <button 
+            <button
               onClick={() => router.push('/')}
               className="flex items-center space-x-1 hover:text-blue-600 transition-colors"
             >
@@ -132,7 +132,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           </nav>
 
           {/* Back Button */}
-          <button 
+          <button
             onClick={handleBackClick}
             className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors mb-8 group"
           >
@@ -141,17 +141,17 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             </svg>
             <span>Back to Categories</span>
           </button>
-          
+
           {/* Category Title and Info */}
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {categoryName} <span className="text-blue-600">AI Tools</span>
             </h1>
-            
+
             <p className="text-xl text-gray-600 mb-6">
               Discover the best {categoryName.toLowerCase()} AI tools to enhance your workflow and productivity.
             </p>
-            
+
             <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 border border-gray-200 shadow-sm">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -163,13 +163,13 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           </div>
         </div>
       </section>
-      
+
       {/* Tools Grid */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {tools.map((tool, index) => (
-              <div 
+              <div
                 key={tool.id}
                 className="tool-card-animate tool-card-hover bg-white rounded-xl border border-gray-200 shadow-sm p-6 group cursor-pointer relative overflow-hidden"
                 onClick={() => handleToolClick(tool.website, tool.name)}
@@ -189,7 +189,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               >
                 {/* Hover Glow Effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-green-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
-                
+
                 {/* Tool Icon and Header */}
                 <div className="relative flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
@@ -211,14 +211,14 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </div>
-                
+
                 {/* Tool Description */}
                 <div className="relative">
                   <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
                     {tool.description}
                   </p>
                 </div>
-                
+
                 {/* Tool Metadata */}
                 <div className="relative flex items-center justify-between pt-4 border-t border-gray-100">
                   <div className="flex items-center space-x-4">
@@ -234,7 +234,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                       </span>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center space-x-1 text-blue-600 group-hover:translate-x-1 transition-transform duration-200">
                     <span className="text-sm font-medium">Visit</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +245,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               </div>
             ))}
           </div>
-          
+
           {/* Empty State Message */}
           {tools.length === 0 && (
             <div className="text-center py-12">
@@ -256,7 +256,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No tools found</h3>
               <p className="text-gray-600 mb-6">We're working on adding more tools to this category.</p>
-              <button 
+              <button
                 onClick={() => router.push('/')}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
               >
