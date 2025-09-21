@@ -228,11 +228,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                         <span className="text-sm font-medium text-gray-700">{tool.rating}</span>
                       </div>
                     )}
-                    {tool.pricing && (
-                      <span className="text-sm font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded-md">
-                        {tool.pricing}
-                      </span>
-                    )}
+
                   </div>
 
                   <div className="flex items-center space-x-1 text-blue-600 group-hover:translate-x-1 transition-transform duration-200">
