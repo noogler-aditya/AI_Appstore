@@ -1,6 +1,83 @@
-import { MessageCircle, Sparkles, ArrowRight } from 'lucide-react'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { MessageCircle, Sparkles, ArrowRight, X, Send } from 'lucide-react'
+
+interface Recommendation {
+  id: string
+  name: string
+  useCase: string
+  website: string
+  matchScore: number
+}
 
 export default function ChatbotTeaser() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [conversation, setConversation] = useState<Array<{ type: 'user' | 'ai', content: string | Recommendation[] }>>([])
+  const [hasConversation, setHasConversation] = useState(false)
+
+  useEffect(() => {
+    // Check for saved conversation
+    const saved = localStorage.getItem('ai-chat-conversation')
+    if (saved) {
+      const parsedConversation = JSON.parse(saved)
+      if (parsedConversation.length > 0) {
+        setHasConversation(true)
+        setConversation(parsedConversation)
+      }
+    }
+  }, [])
+
+  const handleTryRecommendations = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    // Save conversation
+    if (conversation.length > 0) {
+      localStorage.setItem('ai-chat-conversation', JSON.stringify(conversation))
+      setHasConversation(true)
+    }
+  }
+
+  const handleSubmitQuery = async () => {
+    if (!query.trim()) return
+
+    setIsLoading(true)
+    const userMessage = query
+    setQuery('')
+
+    // Add user message to conversation
+    const newConversation = [...conversation, { type: 'user' as const, content: userMessage }]
+    setConversation(newConversation)
+
+    try {
+      const response = await fetch('/api/ai-recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: userMessage })
+      })
+
+      const data = await response.json()
+
+      if (data.recommendations) {
+        setRecommendations(data.recommendations)
+        setConversation([...newConversation, { type: 'ai' as const, content: data.recommendations }])
+      }
+    } catch (error) {
+      console.error('Failed to get recommendations:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResumeChat = () => {
+    setIsModalOpen(true)
+  }
   return (
     <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,17 +87,17 @@ export default function ChatbotTeaser() {
               <Sparkles className="w-6 h-6 text-primary" />
               <span className="text-primary font-medium">AI-Powered Recommendations</span>
             </div>
-            
+
             <h2 className="text-4xl font-bold text-gray-900 mb-6">
               Ask AI to Find Your
               <span className="text-primary"> Perfect Tool</span>
             </h2>
-            
+
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Describe what you need, and our AI will instantly recommend the best tools 
+              Describe what you need, and our AI will instantly recommend the best tools
               for your specific requirements. No more endless searching.
             </p>
-            
+
             <div className="space-y-4 mb-8">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-accent rounded-full"></div>
@@ -35,14 +112,29 @@ export default function ChatbotTeaser() {
                 <span className="text-gray-700">Get started in under 30 seconds</span>
               </div>
             </div>
-            
-            <button className="btn-primary text-lg px-8 py-4 flex items-center space-x-2">
-              <MessageCircle className="w-5 h-5" />
-              <span>Try AI Recommendations</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={handleTryRecommendations}
+                className="btn-primary text-lg px-8 py-4 flex items-center space-x-2"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>Try AI Recommendations</span>
+                <ArrowRight className="w-5 h-5" />
+              </button>
+
+              {hasConversation && (
+                <button
+                  onClick={handleResumeChat}
+                  className="btn-secondary text-lg px-8 py-4 flex items-center space-x-2"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  <span>Resume your tool search?</span>
+                </button>
+              )}
+            </div>
           </div>
-          
+
           <div className="relative">
             <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
               <div className="flex items-center space-x-3 mb-6">
@@ -54,19 +146,19 @@ export default function ChatbotTeaser() {
                   <span className="text-sm text-green-500">● Online</span>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="bg-gray-100 rounded-lg p-3 max-w-xs">
                   <p className="text-sm text-gray-700">
                     "I need an AI tool to help me write better code and catch bugs"
                   </p>
                 </div>
-                
+
                 <div className="bg-primary/10 rounded-lg p-4 ml-4">
                   <p className="text-sm text-gray-700 mb-3">
                     Based on your needs, here are my top 3 recommendations:
                   </p>
-                  
+
                   <div className="space-y-2">
                     <div className="bg-white rounded-lg p-3 border border-gray-200">
                       <div className="flex items-center justify-between">
@@ -74,14 +166,14 @@ export default function ChatbotTeaser() {
                         <span className="text-xs bg-accent text-white px-2 py-1 rounded">95% match</span>
                       </div>
                     </div>
-                    
+
                     <div className="bg-white rounded-lg p-3 border border-gray-200">
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-sm">Tabnine</span>
                         <span className="text-xs bg-primary text-white px-2 py-1 rounded">88% match</span>
                       </div>
                     </div>
-                    
+
                     <div className="bg-white rounded-lg p-3 border border-gray-200">
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-sm">CodeT5</span>
@@ -92,13 +184,120 @@ export default function ChatbotTeaser() {
                 </div>
               </div>
             </div>
-            
+
             <div className="absolute -top-4 -right-4 w-8 h-8 bg-accent rounded-full flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
           </div>
         </div>
       </div>
+
+      {/* AI Chat Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">AI Tool Recommendations</h3>
+                  <span className="text-sm text-green-500">● Ready to help</span>
+                </div>
+              </div>
+              <button
+                onClick={handleCloseModal}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {conversation.length === 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  <Sparkles className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p>Tell me what you're looking to build or accomplish, and I'll recommend the perfect AI tools!</p>
+                  <p className="text-sm mt-2">Example: "I want tools for building a SaaS MVP"</p>
+                </div>
+              )}
+
+              {conversation.map((message, index) => (
+                <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {message.type === 'user' ? (
+                    <div className="bg-primary text-white rounded-lg px-4 py-2 max-w-xs">
+                      {message.content as string}
+                    </div>
+                  ) : (
+                    <div className="space-y-3 max-w-full">
+                      <div className="bg-gray-100 rounded-lg p-4">
+                        <p className="text-sm text-gray-700 mb-3">Here are my top recommendations for you:</p>
+                        <div className="space-y-3">
+                          {(message.content as Recommendation[]).map((rec) => (
+                            <div
+                              key={rec.id}
+                              className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary transition-colors cursor-pointer"
+                              onClick={() => window.open(rec.website, '_blank')}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-gray-900">{rec.name}</h4>
+                                <span className="text-xs bg-primary text-white px-2 py-1 rounded-full">
+                                  {rec.matchScore}% match
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-2">{rec.useCase}</p>
+                              <div className="flex items-center text-primary text-sm">
+                                <span>Visit tool</span>
+                                <ArrowRight className="w-4 h-4 ml-1" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 rounded-lg p-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                      <span className="text-sm text-gray-600">Finding the perfect tools for you...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input Area */}
+            <div className="border-t border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSubmitQuery()}
+                  placeholder="Describe what you want to build or accomplish..."
+                  className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  disabled={isLoading}
+                />
+                <button
+                  onClick={handleSubmitQuery}
+                  disabled={!query.trim() || isLoading}
+                  className="bg-primary text-white p-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -1,0 +1,137 @@
+[
+  {
+    "id": "1",
+    "name": "ChatGPT",
+    "description": "Advanced conversational AI for writing, coding, and problem-solving",
+    "website": "https://chat.openai.com",
+    "category": "Chatbots",
+    "rating": 4.7,
+    "useCase": "Perfect for content creation, coding assistance, and brainstorming"
+  },
+  {
+    "id": "2",
+    "name": "Claude",
+    "description": "AI assistant by Anthropic for helpful, harmless, and honest conversations",
+    "website": "https://claude.ai",
+    "category": "Chatbots",
+    "rating": 4.6,
+    "useCase": "Ideal for research, analysis, and thoughtful conversations"
+  },
+  {
+    "id": "19",
+    "name": "Cursor",
+    "description": "AI-first code editor built for pair programming with AI",
+    "website": "https://cursor.sh",
+    "category": "Coding",
+    "rating": 4.7,
+    "useCase": "Essential for AI-powered coding and development"
+  },
+  {
+    "id": "20",
+    "name": "GitHub Copilot",
+    "description": "AI pair programmer that helps you write code faster",
+    "website": "https://github.com/features/copilot",
+    "category": "Coding",
+    "rating": 4.6,
+    "useCase": "Must-have for faster code completion and suggestions"
+  },
+  {
+    "id": "10",
+    "name": "Gamma",
+    "description": "Create presentations, documents, and websites with AI assistance",
+    "website": "https://gamma.app",
+    "category": "Presentation",
+    "rating": 4.6,
+    "useCase": "Perfect for creating professional presentations quickly"
+  },
+  {
+    "id": "32",
+    "name": "Midjourney",
+    "description": "AI art generator creating stunning images from text prompts",
+    "website": "https://midjourney.com",
+    "category": "Image Generation",
+    "rating": 4.7,
+    "useCase": "Best for creating high-quality artistic images and designs"
+  },
+  {
+    "id": "29",
+    "name": "DALL-E",
+    "description": "OpenAI's image generator that creates images from text descriptions",
+    "website": "https://openai.com/dall-e-2",
+    "category": "Image Generation",
+    "rating": 4.5,
+    "useCase": "Great for realistic image generation and creative visuals"
+  },
+  {
+    "id": "53",
+    "name": "Grammarly",
+    "description": "AI writing assistant for grammar, style, and clarity",
+    "website": "https://grammarly.com",
+    "category": "Writing",
+    "rating": 4.5,
+    "useCase": "Essential for improving writing quality and grammar"
+  },
+  {
+    "id": "52",
+    "name": "Copy.AI",
+    "description": "AI copywriter for marketing content and creative writing",
+    "website": "https://copy.ai",
+    "category": "Writing",
+    "rating": 4.2,
+    "useCase": "Perfect for marketing copy and content creation"
+  },
+  {
+    "id": "81",
+    "name": "Canva",
+    "description": "Design platform with AI-powered templates and magic tools",
+    "website": "https://canva.com",
+    "category": "Design",
+    "rating": 4.4,
+    "useCase": "Ideal for quick design creation and social media graphics"
+  },
+  {
+    "id": "78",
+    "name": "Runway",
+    "description": "AI video editing and generation platform for creators",
+    "website": "https://runwayml.com",
+    "category": "Video Generation",
+    "rating": 4.4,
+    "useCase": "Best for AI-powered video editing and creation"
+  },
+  {
+    "id": "46",
+    "name": "Otter",
+    "description": "AI meeting transcription and collaboration platform",
+    "website": "https://otter.ai",
+    "category": "Meeting Notes",
+    "rating": 4.5,
+    "useCase": "Perfect for automatic meeting transcription and notes"
+  },
+  {
+    "id": "68",
+    "name": "Notion",
+    "description": "All-in-one workspace with AI writing and organization features",
+    "website": "https://notion.so",
+    "category": "Knowledge Management",
+    "rating": 4.4,
+    "useCase": "Essential for project management and team collaboration"
+  },
+  {
+    "id": "51",
+    "name": "Zapier",
+    "description": "Automation platform connecting 5000+ apps with AI features",
+    "website": "https://zapier.com",
+    "category": "Workflow Automation",
+    "rating": 4.4,
+    "useCase": "Must-have for automating workflows and connecting apps"
+  },
+  {
+    "id": "61",
+    "name": "Calendly",
+    "description": "AI-enhanced scheduling and appointment booking platform",
+    "website": "https://calendly.com",
+    "category": "Scheduling",
+    "rating": 4.3,
+    "useCase": "Perfect for automated scheduling and calendar management"
+  }
+]
