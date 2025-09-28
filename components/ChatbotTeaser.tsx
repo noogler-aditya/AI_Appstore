@@ -11,12 +11,21 @@ interface Recommendation {
   matchScore: number
 }
 
+interface WorkflowStep {
+  step: number
+  title: string
+  description: string
+  tools: Recommendation[]
+}
+
 export default function ChatbotTeaser() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedMode, setSelectedMode] = useState<'toolkit' | 'workflow' | null>(null)
   const [query, setQuery] = useState('')
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [workflow, setWorkflow] = useState<WorkflowStep[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [conversation, setConversation] = useState<Array<{ type: 'user' | 'ai', content: string | Recommendation[] }>>([])
+  const [conversation, setConversation] = useState<Array<{ type: 'user' | 'ai', content: string | Recommendation[] | WorkflowStep[] }>>([])
   const [hasConversation, setHasConversation] = useState(false)
 
   useEffect(() => {
@@ -33,10 +42,12 @@ export default function ChatbotTeaser() {
 
   const handleTryRecommendations = () => {
     setIsModalOpen(true)
+    setSelectedMode(null) // Reset mode selection
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
+    setSelectedMode(null)
     // Save conversation
     if (conversation.length > 0) {
       localStorage.setItem('ai-chat-conversation', JSON.stringify(conversation))
@@ -44,8 +55,12 @@ export default function ChatbotTeaser() {
     }
   }
 
+  const handleModeSelect = (mode: 'toolkit' | 'workflow') => {
+    setSelectedMode(mode)
+  }
+
   const handleSubmitQuery = async () => {
-    if (!query.trim()) return
+    if (!query.trim() || !selectedMode) return
 
     setIsLoading(true)
     const userMessage = query
@@ -59,14 +74,20 @@ export default function ChatbotTeaser() {
       const response = await fetch('/api/ai-recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: userMessage })
+        body: JSON.stringify({ 
+          query: userMessage,
+          mode: selectedMode 
+        })
       })
 
       const data = await response.json()
 
-      if (data.recommendations) {
+      if (selectedMode === 'toolkit' && data.recommendations) {
         setRecommendations(data.recommendations)
         setConversation([...newConversation, { type: 'ai' as const, content: data.recommendations }])
+      } else if (selectedMode === 'workflow' && data.workflow) {
+        setWorkflow(data.workflow)
+        setConversation([...newConversation, { type: 'ai' as const, content: data.workflow }])
       }
     } catch (error) {
       console.error('Failed to get recommendations:', error)
@@ -217,11 +238,55 @@ export default function ChatbotTeaser() {
 
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {conversation.length === 0 && (
+              {!selectedMode && conversation.length === 0 && (
+                <div className="text-center py-8">
+                  <Sparkles className="w-12 h-12 text-primary mx-auto mb-6" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Choose Your AI Assistant Mode</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto">
+                    <button
+                      onClick={() => handleModeSelect('toolkit')}
+                      className="p-6 border-2 border-gray-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-left"
+                    >
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+                        <MessageCircle className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Toolkit Recommendation</h4>
+                      <p className="text-sm text-gray-600">Find the best individual tools for specific tasks</p>
+                    </button>
+                    <button
+                      onClick={() => handleModeSelect('workflow')}
+                      className="p-6 border-2 border-gray-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-left"
+                    >
+                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3">
+                        <Sparkles className="w-5 h-5 text-green-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Workflow Builder</h4>
+                      <p className="text-sm text-gray-600">Get step-by-step project workflows with recommended tools</p>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedMode && conversation.length === 0 && (
                 <div className="text-center text-gray-500 py-8">
-                  <Sparkles className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p>Tell me what you're looking to build or accomplish, and I'll recommend the perfect AI tools!</p>
-                  <p className="text-sm mt-2">Example: "I want tools for building a SaaS MVP"</p>
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    {selectedMode === 'toolkit' ? <MessageCircle className="w-6 h-6 text-primary" /> : <Sparkles className="w-6 h-6 text-primary" />}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    {selectedMode === 'toolkit' ? 'Toolkit Recommendation Mode' : 'Workflow Builder Mode'}
+                  </h3>
+                  <p className="mb-2">
+                    {selectedMode === 'toolkit' 
+                      ? 'Tell me what specific task you need tools for!'
+                      : 'Describe your project and I\'ll create a complete workflow!'
+                    }
+                  </p>
+                  <p className="text-sm">
+                    {selectedMode === 'toolkit' 
+                      ? 'Example: "I need tools to edit videos"'
+                      : 'Example: "SaaS development" or "Launch a podcast"'
+                    }
+                  </p>
                 </div>
               )}
 
@@ -233,30 +298,68 @@ export default function ChatbotTeaser() {
                     </div>
                   ) : (
                     <div className="space-y-3 max-w-full">
-                      <div className="bg-gray-100 rounded-lg p-4">
-                        <p className="text-sm text-gray-700 mb-3">Here are my top recommendations for you:</p>
-                        <div className="space-y-3">
-                          {(message.content as Recommendation[]).map((rec) => (
-                            <div
-                              key={rec.id}
-                              className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary transition-colors cursor-pointer"
-                              onClick={() => window.open(rec.website, '_blank')}
-                            >
-                              <div className="flex items-center justify-between mb-2">
-                                <h4 className="font-semibold text-gray-900">{rec.name}</h4>
-                                <span className="text-xs bg-primary text-white px-2 py-1 rounded-full">
-                                  {rec.matchScore}% match
-                                </span>
+                      {Array.isArray(message.content) && message.content.length > 0 && 'step' in message.content[0] ? (
+                        // Workflow response
+                        <div className="bg-gray-100 rounded-lg p-4">
+                          <p className="text-sm text-gray-700 mb-4">Here's your complete project workflow:</p>
+                          <div className="space-y-4">
+                            {(message.content as WorkflowStep[]).map((step) => (
+                              <div key={step.step} className="bg-white rounded-lg p-4 border border-gray-200">
+                                <div className="flex items-start space-x-3 mb-3">
+                                  <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                    {step.step}
+                                  </div>
+                                  <div className="flex-1">
+                                    <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
+                                    <p className="text-sm text-gray-600 mb-3">{step.description}</p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      {step.tools.map((tool) => (
+                                        <div
+                                          key={tool.id}
+                                          className="bg-gray-50 rounded-lg p-3 hover:bg-primary/5 transition-colors cursor-pointer border"
+                                          onClick={() => window.open(tool.website, '_blank')}
+                                        >
+                                          <div className="flex items-center justify-between mb-1">
+                                            <span className="font-medium text-sm">{tool.name}</span>
+                                            <ArrowRight className="w-3 h-3 text-primary" />
+                                          </div>
+                                          <p className="text-xs text-gray-600">{tool.useCase}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                              <p className="text-sm text-gray-600 mb-2">{rec.useCase}</p>
-                              <div className="flex items-center text-primary text-sm">
-                                <span>Visit tool</span>
-                                <ArrowRight className="w-4 h-4 ml-1" />
-                              </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        // Toolkit response
+                        <div className="bg-gray-100 rounded-lg p-4">
+                          <p className="text-sm text-gray-700 mb-3">Here are my top recommendations for you:</p>
+                          <div className="space-y-3">
+                            {(message.content as Recommendation[]).map((rec) => (
+                              <div
+                                key={rec.id}
+                                className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary transition-colors cursor-pointer"
+                                onClick={() => window.open(rec.website, '_blank')}
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <h4 className="font-semibold text-gray-900">{rec.name}</h4>
+                                  <span className="text-xs bg-primary text-white px-2 py-1 rounded-full">
+                                    {rec.matchScore}% match
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-2">{rec.useCase}</p>
+                                <div className="flex items-center text-primary text-sm">
+                                  <span>Visit tool</span>
+                                  <ArrowRight className="w-4 h-4 ml-1" />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -275,26 +378,42 @@ export default function ChatbotTeaser() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-gray-200 p-6">
-              <div className="flex items-center space-x-3">
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSubmitQuery()}
-                  placeholder="Describe what you want to build or accomplish..."
-                  className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  disabled={isLoading}
-                />
-                <button
-                  onClick={handleSubmitQuery}
-                  disabled={!query.trim() || isLoading}
-                  className="bg-primary text-white p-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
+            {selectedMode && (
+              <div className="border-t border-gray-200 p-6">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSubmitQuery()}
+                    placeholder={selectedMode === 'toolkit' 
+                      ? "What task do you need tools for?" 
+                      : "What project do you want to build?"
+                    }
+                    className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    disabled={isLoading}
+                  />
+                  <button
+                    onClick={handleSubmitQuery}
+                    disabled={!query.trim() || isLoading}
+                    className="bg-primary text-white p-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-xs text-gray-500">
+                    Mode: {selectedMode === 'toolkit' ? 'Toolkit Recommendation' : 'Workflow Builder'}
+                  </span>
+                  <button
+                    onClick={() => setSelectedMode(null)}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Change mode
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
