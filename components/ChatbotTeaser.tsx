@@ -57,6 +57,20 @@ export default function ChatbotTeaser() {
 
   const handleModeSelect = (mode: 'toolkit' | 'workflow') => {
     setSelectedMode(mode)
+    // Reset conversation state when switching modes to prevent conflicts
+    setConversation([])
+    setRecommendations([])
+    setWorkflow([])
+    setQuery('')
+  }
+
+  const handleSwitchMode = () => {
+    // Reset all state and show mode selection again
+    setSelectedMode(null)
+    setConversation([])
+    setRecommendations([])
+    setWorkflow([])
+    setQuery('')
   }
 
   const handleSubmitQuery = async () => {
@@ -74,9 +88,9 @@ export default function ChatbotTeaser() {
       const response = await fetch('/api/ai-recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           query: userMessage,
-          mode: selectedMode 
+          mode: selectedMode
         })
       })
 
@@ -276,13 +290,13 @@ export default function ChatbotTeaser() {
                     {selectedMode === 'toolkit' ? 'Toolkit Recommendation Mode' : 'Workflow Builder Mode'}
                   </h3>
                   <p className="mb-2">
-                    {selectedMode === 'toolkit' 
+                    {selectedMode === 'toolkit'
                       ? 'Tell me what specific task you need tools for!'
                       : 'Describe your project and I\'ll create a complete workflow!'
                     }
                   </p>
                   <p className="text-sm">
-                    {selectedMode === 'toolkit' 
+                    {selectedMode === 'toolkit'
                       ? 'Example: "I need tools to edit videos"'
                       : 'Example: "SaaS development" or "Launch a podcast"'
                     }
@@ -386,8 +400,8 @@ export default function ChatbotTeaser() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSubmitQuery()}
-                    placeholder={selectedMode === 'toolkit' 
-                      ? "What task do you need tools for?" 
+                    placeholder={selectedMode === 'toolkit'
+                      ? "What task do you need tools for?"
                       : "What project do you want to build?"
                     }
                     className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -401,15 +415,21 @@ export default function ChatbotTeaser() {
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
-                    Mode: {selectedMode === 'toolkit' ? 'Toolkit Recommendation' : 'Workflow Builder'}
-                  </span>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-2 h-2 rounded-full ${selectedMode === 'toolkit' ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+                    <span className="text-sm font-medium text-gray-700">
+                      {selectedMode === 'toolkit' ? 'Toolkit Mode' : 'Workflow Mode'}
+                    </span>
+                  </div>
                   <button
-                    onClick={() => setSelectedMode(null)}
-                    className="text-xs text-primary hover:underline"
+                    onClick={handleSwitchMode}
+                    className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-full transition-colors duration-200"
                   >
-                    Change mode
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    <span>Switch Mode</span>
                   </button>
                 </div>
               </div>
